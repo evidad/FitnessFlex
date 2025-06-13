@@ -13,7 +13,6 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.*
 import androidx.navigation.compose.rememberNavController
 import com.example.fitnessflex.ui.theme.FitnessFlexTheme
-import androidx.compose.material.icons.filled.Place
 
 
 
@@ -24,46 +23,49 @@ class MainActivity : ComponentActivity() {
         setContent {
             FitnessFlexTheme {
                 val navController = rememberNavController()
-                val items = listOf(Screen.Entry, Screen.Map, Screen.Settings)
+                val items = listOf(Screen.Entry, Screen.Settings)
+
+
 
                 Scaffold(
                     bottomBar = {
-                        NavigationBar {
-                            val navBackStackEntry by navController.currentBackStackEntryAsState()
-                            val currentRoute = navBackStackEntry?.destination?.route
-
-                            items.forEach { screen ->
-                                NavigationBarItem(
-                                    icon = {
-                                        Icon(
-                                            imageVector = when (screen) {
-                                                is Screen.Entry -> Icons.Default.Edit
-                                                is Screen.Map -> Icons.Default.Place
-                                                is Screen.Settings -> Icons.Default.Settings
-                                            },
-                                            contentDescription = screen.route
-                                        )
-                                    },
-                                    selected = currentRoute == screen.route,
-                                    onClick = {
-                                        if (currentRoute != screen.route) {
-                                            navController.navigate(screen.route)
-                                        }
-                                    },
-                                    label = { Text(screen.route.replaceFirstChar { it.uppercase() }) }
-                                )
+                        val navBackStackEntry by navController.currentBackStackEntryAsState()
+                        val currentRoute = navBackStackEntry?.destination?.route
+                        if (currentRoute != Screen.Login.route) {
+                            NavigationBar {
+                                items.forEach { screen ->
+                                    NavigationBarItem(
+                                        icon = {
+                                            Icon(
+                                                imageVector = when (screen) {
+                                                    Screen.Entry -> Icons.Default.Edit
+                                                    Screen.Settings -> Icons.Default.Settings
+                                                    else -> Icons.Default.Edit
+                                                },
+                                                contentDescription = screen.route
+                                            )
+                                        },
+                                        selected = currentRoute == screen.route,
+                                        onClick = {
+                                            if (currentRoute != screen.route) {
+                                                navController.navigate(screen.route)
+                                            }
+                                        },
+                                        label = { Text(screen.route.replaceFirstChar { it.uppercase() }) }
+                                    )
+                                }
                             }
                         }
                     }
                 ) { innerPadding ->
                     NavHost(
                         navController = navController,
-                        startDestination = Screen.Entry.route,
+                        startDestination = Screen.Login.route,
                         modifier = Modifier.padding(innerPadding)
                     ) {
+                        composable(Screen.Login.route) { LoginScreen(navController) }
                         composable(Screen.Entry.route) { EntryScreen() }
-                        composable(Screen.Map.route) { MapScreen() }
-                        composable(Screen.Settings.route) { SettingsScreen() }
+                        composable(Screen.Settings.route) { SettingsScreen(navController) }
                     }
                 }
             }
